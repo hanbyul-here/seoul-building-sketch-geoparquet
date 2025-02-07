@@ -1,17 +1,18 @@
 import { useState, useEffect } from "react";
 import wasmInit, { readParquet } from "parquet-wasm";
 import type { Table } from "apache-arrow";
-import Box from "@mui/material/Box";
-
-import * as pmtiles from "pmtiles";
-import * as maplibregl from "maplibre-gl";
-
 import { tableFromIPC } from "apache-arrow";
+
+import { Protocol } from "pmtiles";
+import * as maplibregl from "maplibre-gl";
 import { Map } from "@vis.gl/react-maplibre";
+import "maplibre-gl/dist/maplibre-gl.css";
+
 import DeckGL, { Layer } from "deck.gl";
 import { GeoArrowSolidPolygonLayer } from "@geoarrow/deck.gl-layers";
 import { DataFilterExtension } from "@deck.gl/extensions";
-import "maplibre-gl/dist/maplibre-gl.css";
+
+import Box from "@mui/material/Box";
 
 import Slider from "./Slider";
 import style from "./style";
@@ -44,7 +45,7 @@ export default function App() {
 
   // Attach pmtile protocol to MapLibre for basemap
   useEffect(() => {
-    const protocol = new pmtiles.Protocol();
+    const protocol = new Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
 
     return () => {
@@ -88,6 +89,7 @@ export default function App() {
         controller={true}
         layers={layers}
       >
+        {/* Why? DeckGL Layer doesn't get rendered when BaseMap component is separated out */}
         <Map mapStyle={style} />
       </DeckGL>
       <Box

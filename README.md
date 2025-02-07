@@ -1,8 +1,11 @@
 # Seoul Building Explorer - GeoParquet
 
-Making data:
+🔗: https://hanbyul-here.github.io/seoul-building-sketch-geoparquet/
+(This page will download the geoparquet data, which is ~ 27MB)
 
-Parquet:
+## Making data:
+
+### Parquet
 
 ```python
 import geopandas as gpd
@@ -18,8 +21,7 @@ table = geopandas_to_geoarrow(bdss)
 write_parquet(table, "building-arro3.parquet")
 ```
 
-Basemap:
-https://maps.protomaps.com/builds/
+### Basemap (https://maps.protomaps.com/builds/)
 
 ```
 pmtiles extract https://build.protomaps.com/20250203.pmtiles ./seoul.pmtiles --bbox=126.736039,37.411321,127.246761,37.711342
