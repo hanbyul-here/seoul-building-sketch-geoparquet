@@ -20,7 +20,7 @@ const wasmUrl =
   "https://cdn.jsdelivr.net/npm/parquet-wasm@0.6.1/esm/parquet_wasm_bg.wasm";
 await wasmInit(wasmUrl);
 
-const GEOARROW_POLYGON_DATA = "/building-arro3.parquet";
+const GEOARROW_POLYGON_DATA = window.location.href + "building-arro3.parquet";
 
 export type ValuePair = [start: number, end: number];
 const timeRange = [1920, 2025] as ValuePair;

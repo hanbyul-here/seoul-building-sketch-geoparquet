@@ -3,7 +3,7 @@ import type { StyleSpecification } from "maplibre-gl";
 
 const isProd = import.meta.env.MODE === "production";
 
-const basemapDataUrl = isProd
+const baseUrl = isProd
   ? `${window.location.origin}/${import.meta.env.BASE_URL}`
   : window.location.origin;
 
@@ -31,7 +31,7 @@ const baseMapStyle: StyleSpecification = {
   sources: {
     basemap: {
       type: "vector",
-      url: `pmtiles://${basemapDataUrl}/seoul.pmtiles`,
+      url: `pmtiles://${baseUrl}/seoul.pmtiles`,
       attribution:
         '<a href="https://www.vworld.kr/">VWorld</a>, <a href="https://protomaps.com">Protomaps</a> © <a href="https://openstreetmap.org">OpenStreetMap</a>',
     },
