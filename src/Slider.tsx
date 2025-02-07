@@ -79,10 +79,6 @@ export default function RangeInput({
         bottom: "20px",
         textAlign: "center",
       }}
-      marks={marks}
-      onMouseDown={(e) => {
-        e.stopPropagation();
-      }}
     >
       <Slider
         min={min}
