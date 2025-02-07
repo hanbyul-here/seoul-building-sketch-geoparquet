@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import wasmInit, { readParquet } from "parquet-wasm";
+import type { Table } from "apache-arrow";
+import Box from "@mui/material/Box";
 
 import * as pmtiles from "pmtiles";
 import * as maplibregl from "maplibre-gl";
@@ -11,16 +13,17 @@ import { GeoArrowSolidPolygonLayer } from "@geoarrow/deck.gl-layers";
 import { DataFilterExtension } from "@deck.gl/extensions";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import Box from "@mui/material/Box";
-
 import Slider from "./Slider";
 import style from "./style";
-// Update this version to match the version you're using.
+// Update this version to match the version
 const wasmUrl =
   "https://cdn.jsdelivr.net/npm/parquet-wasm@0.6.1/esm/parquet_wasm_bg.wasm";
 await wasmInit(wasmUrl);
 
 const GEOARROW_POLYGON_DATA = "/building-arro3.parquet";
+
+export type ValuePair = [start: number, end: number];
+const timeRange = [1920, 2025] as ValuePair;
 
 const INITIAL_VIEW_STATE = {
   latitude: 37.55,
@@ -30,23 +33,16 @@ const INITIAL_VIEW_STATE = {
   pitch: 0,
 };
 
-const MAP_STYLE =
-  "https://basemaps.cartocdn.com/gl/positron-nolabels-gl-style/style.json";
-
-const NAV_CONTROL_STYLE = {
-  position: "absolute",
-  top: 10,
-  left: 10,
-};
-
 function formatLabel(year: number): string {
   return `${year}`;
 }
 export default function App() {
-  const timeRange = [1920, 2025];
-  const [table, setTable] = useState<arrow.Table | null>(null);
+  const [table, setTable] = useState<Table | null>(null);
 
-  // Attach pmtile protocol to MapLibre
+  const layers: Layer[] = [];
+  const [filterValue, setFilter] = useState<ValuePair>(timeRange);
+
+  // Attach pmtile protocol to MapLibre for basemap
   useEffect(() => {
     const protocol = new pmtiles.Protocol();
     maplibregl.addProtocol("pmtiles", protocol.tile);
@@ -56,8 +52,8 @@ export default function App() {
     };
   }, []);
 
+  // Fetch parquet, build table
   useEffect(() => {
-    // declare the data fetching function
     const fetchData = async () => {
       const resp = await fetch(GEOARROW_POLYGON_DATA);
       const arrayBuffer = await resp.arrayBuffer();
@@ -71,12 +67,7 @@ export default function App() {
     }
   });
 
-  const layers: Layer[] = [];
-  const [filterValue, setFilter] = useState<
-    [start: number, end: number] | null
-  >(timeRange);
-
-  table &&
+  if (table) {
     layers.push(
       new GeoArrowSolidPolygonLayer({
         id: "geoarrow-polygons",
@@ -88,6 +79,7 @@ export default function App() {
         extensions: [new DataFilterExtension({ filterSize: 1 })],
       })
     );
+  }
 
   return (
     <>
@@ -101,29 +93,30 @@ export default function App() {
       <Box
         component="div"
         sx={{
-          padding: "20px",
-          width: "200px",
           backgroundColor: "white",
           position: "absolute",
-          right: "calc(50% - 100px)",
-          bottom: "20px",
-          textAlign: "center",
-        }}
-        onMouseDown={(e) => {
-          e.stopPropagation();
+          padding: "0 12px",
+          top: "20px",
+          left: "20px",
+          width: "250px",
         }}
       >
-        <Slider
-          min={1920}
-          max={2025}
-          value={filterValue}
-          animationSpeed={1}
-          formatLabel={formatLabel}
-          onChange={(newVal) => {
-            setFilter(newVal);
-          }}
-        />
+        <p style={{ color: "#333", fontSize: "12px" }}>
+          이 지도는 서울 건물들이 언제 사용승인 허가를 받았는지 보여줍니다.
+          아래의 슬라이더를 이용해서 승인 연도의 범위를 조정할 수 있습니다.
+        </p>
       </Box>
+
+      <Slider
+        min={timeRange[0]}
+        max={timeRange[1]}
+        value={filterValue}
+        animationSpeed={1}
+        formatLabel={formatLabel}
+        onChange={(newVal) => {
+          setFilter(newVal);
+        }}
+      />
     </>
   );
 }

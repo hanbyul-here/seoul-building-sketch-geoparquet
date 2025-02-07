@@ -2,8 +2,18 @@
 import { useEffect, useState } from "react";
 import Slider from "@mui/material/Slider";
 import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import PlayIcon from "@mui/icons-material/PlayCircle";
 import PauseIcon from "@mui/icons-material/PauseCircle";
+import type { ValuePair } from "./App";
+
+const marks = [
+  {
+    value: 1920,
+    label: "1920",
+  },
+  { value: 2025, label: "2025" },
+];
 
 export default function RangeInput({
   min,
@@ -17,7 +27,7 @@ export default function RangeInput({
   max: number;
   value: [start: number, end: number];
   animationSpeed: number;
-  onChange: (value: [start: number, end: number]) => void;
+  onChange: (value: ValuePair) => void;
   formatLabel: (value: number) => string;
 }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -57,16 +67,33 @@ export default function RangeInput({
   const isButtonEnabled = value[0] > min || value[1] < max;
 
   return (
-    <>
+    <Box
+      component="div"
+      sx={{
+        padding: "12px 24px",
+        width: "300px",
+        backgroundColor: "white",
+        position: "absolute",
+        left: "50%",
+        transform: "translate(-50%, -20%)",
+        bottom: "20px",
+        textAlign: "center",
+      }}
+      marks={marks}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+      }}
+    >
       <Slider
         min={min}
         max={max}
         value={value}
-        onChange={(_e, newValue: [start: number, end: number]) => {
-          onChange(newValue);
+        onChange={(_e, newValue) => {
+          onChange(newValue as ValuePair);
         }}
         valueLabelDisplay="auto"
         valueLabelFormat={formatLabel}
+        marks={marks}
       />
       <Button
         color="primary"
@@ -76,6 +103,6 @@ export default function RangeInput({
       >
         {isPlaying ? <PauseIcon /> : <PlayIcon />}
       </Button>
-    </>
+    </Box>
   );
 }
